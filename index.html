@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Speak, Listen, Learn</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #0f1923;
+    --surface: #162333;
+    --card: #1e3245;
+    --accent: #4fc3f7;
+    --accent2: #f9a825;
+    --green: #66bb6a;
+    --red: #ef5350;
+    --text: #e8f4fd;
+    --muted: #7ea9c4;
+    --border: #2a4a66;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    width: 100%;
+    background: linear-gradient(135deg, #0d2137 0%, #1a3a55 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 20px 14px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(79,195,247,0.15);
+  }
+
+  header h1 {
+    font-family: 'Lora', serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  header p {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  main {
+    width: 100%;
+    max-width: 480px;
+    padding: 16px 14px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* SETTINGS */
+  .settings-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .settings-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+
+  label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+  }
+
+  select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-radius: 10px;
+    width: 100%;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234fc3f7' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+  select:focus { outline: none; border-color: var(--accent); }
+
+  .level-pills { display: flex; gap: 8px; }
+  .pill {
+    flex: 1;
+    padding: 9px 4px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .pill.active {
+    border-color: var(--accent);
+    background: rgba(79,195,247,0.15);
+    color: var(--accent);
+  }
+
+  .btn-start {
+    background: linear-gradient(135deg, var(--accent) 0%, #0288d1 100%);
+    color: #0a1929;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-start:active { transform: scale(0.98); }
+
+  /* PRACTICE */
+  #practice-section { display: none; flex-direction: column; gap: 14px; }
+
+  .progress-bar-wrap {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-label { font-size: 0.72rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #0288d1);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-count { font-size: 0.72rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
+
+  .sentence-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    text-align: center;
+  }
+  .scenario-badge {
+    display: inline-block;
+    background: rgba(249,168,37,0.15);
+    border: 1px solid rgba(249,168,37,0.4);
+    color: var(--accent2);
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .sentence-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .sentence-text {
+    font-family: 'Lora', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  /* MIC */
+  .mic-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0 6px;
+  }
+  .mic-hint { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+  .mic-btn {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    background: rgba(79,195,247,0.08);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mic-btn.recording {
+    border-color: var(--red);
+    background: rgba(239,83,80,0.15);
+    color: var(--red);
+    animation: pulse 1.2s infinite;
+  }
+  .mic-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    border-color: var(--border);
+    color: var(--muted);
+    animation: none;
+  }
+  .mic-btn svg { width: 34px; height: 34px; }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,83,80,0.4); }
+    50% { box-shadow: 0 0 0 14px rgba(239,83,80,0); }
+  }
+  .recording-status { font-size: 0.78rem; color: var(--red); font-weight: 700; min-height: 20px; }
+
+  .transcript-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    min-height: 50px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* WARN */
+  .warn-banner {
+    background: rgba(249,168,37,0.1);
+    border: 1px solid rgba(249,168,37,0.35);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: #ffd54f;
+    line-height: 1.5;
+    display: none;
+  }
+  .warn-banner.visible { display: block; }
+
+  /* FALLBACK */
+  .fallback-area { display: none; flex-direction: column; gap: 8px; }
+  .fallback-area.visible { display: flex; }
+  .fallback-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+  .fallback-input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    width: 100%;
+    resize: none;
+  }
+  .fallback-input:focus { outline: none; border-color: var(--accent); }
+  .btn-fallback-submit {
+    background: rgba(102,187,106,0.12);
+    border: 1.5px solid rgba(102,187,106,0.4);
+    color: var(--green);
+    border-radius: 10px;
+    padding: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-fallback-submit:active { transform: scale(0.97); }
+  .or-divider { text-align: center; font-size: 0.72rem; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
+
+  /* SUBMIT */
+  .btn-submit {
+    background: linear-gradient(135deg, var(--green) 0%, #388e3c 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-submit.visible { display: flex; }
+  .btn-submit:active { transform: scale(0.97); }
+
+  /* RESULT */
+  .result-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    flex-direction: column;
+    gap: 10px;
+    display: none;
+  }
+  .result-card.visible { display: flex; }
+
+  .correct-answer {
+    border: 1px solid rgba(102,187,106,0.4);
+    background: rgba(102,187,106,0.08);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+  }
+  .correct-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--green); margin-bottom: 6px; }
+  .correct-text { font-family: 'Lora', serif; font-size: 1.05rem; color: var(--text); line-height: 1.5; padding-right: 30px; }
+
+  .feedback-box {
+    border: 1px solid rgba(79,195,247,0.2);
+    background: rgba(79,195,247,0.05);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+  }
+  .feedback-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); margin-bottom: 6px; }
+  .feedback-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; padding-right: 30px; }
+
+  .speak-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: none; border: none; color: var(--accent);
+    cursor: pointer; padding: 4px; opacity: 0.65; transition: opacity 0.2s;
+  }
+  .speak-btn:hover { opacity: 1; }
+  .speak-btn svg { width: 17px; height: 17px; }
+
+  /* ACTIONS */
+  .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-repeat, .btn-next {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-repeat {
+    background: rgba(249,168,37,0.12);
+    border: 1.5px solid rgba(249,168,37,0.4);
+    color: var(--accent2);
+  }
+  .btn-next {
+    background: linear-gradient(135deg, var(--accent) 0%, #0288d1 100%);
+    color: #0a1929;
+  }
+  .btn-repeat:active, .btn-next:active { transform: scale(0.97); }
+
+  /* COMPLETE */
+  .complete-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px 20px;
+    text-align: center;
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .complete-card.visible { display: flex; }
+  .complete-emoji { font-size: 3rem; }
+  .complete-title { font-family: 'Lora', serif; font-size: 1.4rem; color: var(--accent); }
+  .complete-sub { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .btn-restart {
+    background: linear-gradient(135deg, var(--accent) 0%, #0288d1 100%);
+    color: #0a1929;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-restart:active { transform: scale(0.97); }
+
+  /* TOP LANGUAGE BAR */
+  .lang-bar {
+    width: 100%;
+    background: linear-gradient(135deg, #0d2137 0%, #162333 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .lang-bar-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .lang-bar-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+  }
+  .lang-bar select {
+    background: var(--card);
+    border: 1.5px solid var(--accent);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 9px 12px;
+    border-radius: 10px;
+    width: 100%;
+  }
+  .lang-arrow {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 10px;
+    color: var(--accent);
+    font-size: 1.2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🗣 Speak, Listen, Learn</h1>
+  <p>Language Practice App</p>
+</header>
+
+<!-- TOP LANGUAGE BAR -->
+<div class="lang-bar">
+  <div class="lang-bar-field">
+    <div class="lang-bar-label">🏠 My Language</div>
+    <select id="my-lang" onchange="syncLangSelects('my')">
+      <option value="en">🇺🇸 English</option>
+      <option value="fr">🇫🇷 French</option>
+      <option value="es">🇪🇸 Spanish</option>
+      <option value="de">🇩🇪 German</option>
+      <option value="pt">🇧🇷 Portuguese</option>
+      <option value="it">🇮🇹 Italian</option>
+    </select>
+  </div>
+  <div class="lang-arrow">⇄</div>
+  <div class="lang-bar-field">
+    <div class="lang-bar-label">🎯 Practice Language</div>
+    <select id="practice-lang" onchange="syncLangSelects('practice')">
+      <option value="vi">🇻🇳 Vietnamese</option>
+      <option value="es">🇪🇸 Spanish</option>
+      <option value="fr">🇫🇷 French</option>
+      <option value="de">🇩🇪 German</option>
+      <option value="ja">🇯🇵 Japanese</option>
+      <option value="it">🇮🇹 Italian</option>
+      <option value="pt">🇧🇷 Portuguese</option>
+      <option value="ko">🇰🇷 Korean</option>
+      <option value="zh">🇨🇳 Mandarin</option>
+    </select>
+  </div>
+</div>
+
+<main>
+  <!-- SETTINGS -->
+  <div class="settings-card" id="settings-card">
+    <div class="settings-title">⚙️ Session Settings</div>
+
+    <div class="field">
+      <label>Level</label>
+      <div class="level-pills">
+        <div class="pill active" data-level="Beginner">🌱 Beginner</div>
+        <div class="pill" data-level="Intermediate">🌿 Intermediate</div>
+        <div class="pill" data-level="Advanced">🌳 Advanced</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Scenario</label>
+      <select id="scenario">
+        <option value="Introductions">👋 Introductions</option>
+        <option value="Numbers">🔢 Numbers</option>
+        <option value="Days of the Week">📅 Days of the Week</option>
+        <option value="Months">📆 Months</option>
+        <option value="Professions">💼 Professions</option>
+        <option value="Food and Drink">🍜 Food and Drink</option>
+        <option value="Shopping">🛍 Shopping</option>
+        <option value="Travel">✈️ Travel</option>
+        <option value="Family">👨‍👩‍👧 Family</option>
+        <option value="Weather">🌤 Weather</option>
+        <option value="Directions">🗺 Directions</option>
+        <option value="Colors">🎨 Colors</option>
+        <option value="Time">⏰ Time</option>
+        <option value="Greetings">🙏 Greetings</option>
+        <option value="At the Doctor">🏥 At the Doctor</option>
+      </select>
+    </div>
+
+    <button class="btn-start" onclick="startPractice()">▶ Start Practice</button>
+  </div>
+
+  <!-- PRACTICE -->
+  <div id="practice-section">
+
+    <div class="progress-bar-wrap">
+      <span class="progress-label">Progress</span>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span class="progress-count" id="progress-count">0 / 8</span>
+    </div>
+
+    <div class="sentence-card" id="sentence-card" style="display:none">
+      <div class="scenario-badge" id="scenario-badge"></div>
+      <div class="sentence-label">Say this in <span id="practice-lang-label">Vietnamese</span>:</div>
+      <div class="sentence-text" id="sentence-display"></div>
+    </div>
+
+    <div class="mic-area" id="mic-area" style="display:none">
+      <div class="mic-hint" id="mic-hint">Tap the mic and speak</div>
+      <button class="mic-btn" id="mic-btn" onclick="toggleRecording()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2" width="6" height="12" rx="3"/>
+          <path d="M5 10a7 7 0 0014 0"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="9" y1="22" x2="15" y2="22"/>
+        </svg>
+      </button>
+      <div class="recording-status" id="recording-status"></div>
+    </div>
+
+    <div class="warn-banner" id="warn-banner">
+      🎤 Microphone not available. You can type your answer below instead.
+    </div>
+
+    <div class="transcript-box" id="transcript-box" style="display:none">Your speech will appear here…</div>
+
+    <div class="or-divider" id="or-divider" style="display:none">— or type your answer —</div>
+
+    <div class="fallback-area" id="fallback-area">
+      <label class="fallback-label">Type in <span id="fallback-lang-label">Vietnamese</span></label>
+      <textarea class="fallback-input" id="fallback-input" rows="2" placeholder="Type your answer here…"></textarea>
+      <button class="btn-fallback-submit" onclick="submitFallback()">✓ Check My Typed Answer</button>
+    </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="showResult()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Check My Answer
+    </button>
+
+    <div class="result-card" id="result-card">
+      <div class="correct-answer">
+        <div class="correct-label">✓ Correct Sentence</div>
+        <div class="correct-text" id="correct-answer-text"></div>
+        <button class="speak-btn" onclick="speakText('correct')" title="Listen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+        </button>
+      </div>
+      <div class="feedback-box">
+        <div class="feedback-label">💬 Feedback</div>
+        <div class="feedback-text" id="feedback-text"></div>
+        <button class="speak-btn" onclick="speakText('feedback')" title="Listen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="action-buttons" id="action-buttons" style="display:none">
+      <button class="btn-repeat" onclick="repeatSentence()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Repeat
+      </button>
+      <button class="btn-next" onclick="nextSentence()">
+        Next
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div class="complete-card" id="complete-card">
+      <div class="complete-emoji">🎉</div>
+      <div class="complete-title">Session Complete!</div>
+      <div class="complete-sub">Great work practicing your <span id="complete-lang">Vietnamese</span>!<br>Keep it up — consistency is key.</div>
+      <button class="btn-restart" onclick="restartPractice()">🔄 Start New Session</button>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SENTENCE BANK
+// Each entry: { en: "English sentence", answer: "Vietnamese translation", feedback: "feedback text" }
+// ═══════════════════════════════════════════════════════════════
+const SENTENCE_BANK = {
+
+  "Introductions": {
+    Beginner: [
+      { en: "My name is Lan.", answer: "Tên tôi là Lan.", feedback: "Great start! 'Tên tôi là' literally means 'Name I is'. A very common alternative is 'Tôi tên là Lan.' — both are natural." },
+      { en: "I am from America.", answer: "Tôi đến từ Mỹ.", feedback: "Well done! 'Đến từ' means 'come from'. Remember 'Mỹ' is how Vietnamese say America." },
+      { en: "Nice to meet you.", answer: "Rất vui được gặp bạn.", feedback: "Excellent! 'Rất vui' means 'very happy' and 'gặp' means 'to meet'. A very polite phrase." },
+      { en: "How old are you?", answer: "Bạn bao nhiêu tuổi?", feedback: "Perfect! 'Bao nhiêu tuổi' literally means 'how many years old'. This is the standard way to ask someone's age." },
+      { en: "I am twenty-five years old.", answer: "Tôi hai mươi lăm tuổi.", feedback: "Great! Notice there's no verb 'to be' — just 'I + age + tuổi'. Very common pattern in Vietnamese." },
+      { en: "Where are you from?", answer: "Bạn đến từ đâu?", feedback: "Excellent! 'Đâu' means 'where'. Remember 'đến từ đâu' = 'come from where'." },
+      { en: "I am a student.", answer: "Tôi là học sinh.", feedback: "Well done! 'Học sinh' refers to a student (school-age). For university, use 'sinh viên'." },
+      { en: "What is your name?", answer: "Tên bạn là gì?", feedback: "Great job! 'Là gì' means 'is what' — Vietnamese questions often put the question word at the end." },
+    ],
+    Intermediate: [
+      { en: "I have been learning Vietnamese for two years.", answer: "Tôi đã học tiếng Việt được hai năm.", feedback: "Well done! 'Đã' marks past action and 'được' here indicates duration. This is a key grammar pattern for talking about how long you've done something." },
+      { en: "I work as an engineer in Hanoi.", answer: "Tôi làm kỹ sư ở Hà Nội.", feedback: "Great! 'Làm' means 'to work as / to do'. Notice no article is needed before 'kỹ sư'." },
+      { en: "It is a pleasure to make your acquaintance.", answer: "Rất hân hạnh được làm quen với bạn.", feedback: "Excellent! 'Hân hạnh' is more formal than 'vui'. 'Làm quen' means 'to get acquainted'. Polished, formal phrasing." },
+      { en: "I live in Ho Chi Minh City.", answer: "Tôi sống ở Thành phố Hồ Chí Minh.", feedback: "Perfect! 'Sống ở' means 'live in'. Note that locals often just say 'Sài Gòn' informally." },
+      { en: "May I ask what you do for work?", answer: "Tôi có thể hỏi bạn làm nghề gì không?", feedback: "Very good! 'Có thể...không' is the polite 'may I / can I' structure. 'Làm nghề gì' means 'do what profession'." },
+    ],
+    Advanced: [
+      { en: "I have always had a passion for Vietnamese culture and language.", answer: "Tôi luôn có niềm đam mê với văn hóa và ngôn ngữ Việt Nam.", feedback: "Impressive! 'Niềm đam mê' means 'passion'. 'Luôn' = always. Great use of abstract vocabulary." },
+      { en: "Despite having studied for two years, I still find the tones very challenging.", answer: "Mặc dù đã học được hai năm, tôi vẫn thấy thanh điệu rất khó.", feedback: "Excellent! 'Mặc dù...vẫn' is the 'although...still' structure. 'Thanh điệu' = tones. Very sophisticated sentence." },
+      { en: "I would love to visit Vietnam someday to practice speaking with locals.", answer: "Tôi rất muốn đến Việt Nam để luyện nói chuyện với người địa phương.", feedback: "Outstanding! 'Để' here means 'in order to'. 'Người địa phương' = local people. Natural and fluent structure." },
+    ]
+  },
+
+  "Numbers": {
+    Beginner: [
+      { en: "I have three brothers.", answer: "Tôi có ba anh trai.", feedback: "Great! In Vietnamese, classifiers like 'anh' (older brother) or 'em' (younger sibling) are important. 'Ba' = three." },
+      { en: "There are ten students in the class.", answer: "Có mười học sinh trong lớp.", feedback: "Well done! 'Có' at the start of a sentence means 'there are/is'. 'Mười' = ten." },
+      { en: "I want two tickets please.", answer: "Cho tôi hai vé.", feedback: "Perfect! 'Cho tôi' is a natural way to say 'give me / I'd like'. 'Vé' = ticket." },
+      { en: "The price is fifty thousand dong.", answer: "Giá là năm mươi nghìn đồng.", feedback: "Excellent! 'Nghìn' = thousand. Vietnamese currency is đồng (VND). Very useful shopping phrase!" },
+      { en: "I wake up at seven o'clock.", answer: "Tôi thức dậy lúc bảy giờ.", feedback: "Great! 'Lúc' is used before time expressions. 'Giờ' means 'o'clock / hour'." },
+      { en: "She is thirty years old.", answer: "Cô ấy ba mươi tuổi.", feedback: "Well done! No 'là' is needed here — age statements work without a linking verb in Vietnamese." },
+      { en: "I need five hundred grams of beef.", answer: "Tôi cần năm trăm gam thịt bò.", feedback: "Good job! 'Trăm' = hundred. 'Thịt bò' = beef. Very practical market vocabulary." },
+      { en: "The phone number is zero nine one two.", answer: "Số điện thoại là không chín một hai.", feedback: "Great! Phone numbers are read digit by digit in Vietnamese, just like English. 'Số điện thoại' = phone number." },
+    ],
+    Intermediate: [
+      { en: "There are over ninety million people in Vietnam.", answer: "Việt Nam có hơn chín mươi triệu người.", feedback: "Excellent! 'Hơn' means 'more than / over'. 'Triệu' = million. Great for talking about statistics." },
+      { en: "I need to exchange two hundred dollars.", answer: "Tôi cần đổi hai trăm đô la.", feedback: "Well done! 'Đổi' means 'to exchange'. 'Đô la' = dollar. Very useful travel vocabulary." },
+      { en: "The flight takes about two and a half hours.", answer: "Chuyến bay mất khoảng hai tiếng rưỡi.", feedback: "Great! 'Khoảng' = approximately. 'Rưỡi' means 'half' when added after a number. 'Tiếng' = hour (colloquial)." },
+    ],
+    Advanced: [
+      { en: "The population of Ho Chi Minh City has grown to over nine million.", answer: "Dân số Thành phố Hồ Chí Minh đã tăng lên hơn chín triệu người.", feedback: "Outstanding! 'Dân số' = population. 'Tăng lên' = grown to. Sophisticated use of statistics vocabulary." },
+      { en: "The price has increased by fifteen percent since last year.", answer: "Giá đã tăng mười lăm phần trăm so với năm ngoái.", feedback: "Impressive! 'Phần trăm' = percent. 'So với' = compared to. Excellent economic/business language." },
+    ]
+  },
+
+  "Days of the Week": {
+    Beginner: [
+      { en: "Today is Monday.", answer: "Hôm nay là thứ Hai.", feedback: "Great! Vietnamese days of the week use numbers: thứ Hai (2nd = Monday) through thứ Bảy (7th = Saturday). Sunday is Chủ Nhật." },
+      { en: "Tomorrow is Tuesday.", answer: "Ngày mai là thứ Ba.", feedback: "Well done! 'Ngày mai' = tomorrow. 'Thứ Ba' = Tuesday (literally 'third day')." },
+      { en: "I work on Fridays.", answer: "Tôi làm việc vào thứ Sáu.", feedback: "Perfect! 'Vào' is used before days to mean 'on'. 'Thứ Sáu' = Friday (sixth day)." },
+      { en: "The market is closed on Sunday.", answer: "Chợ đóng cửa vào Chủ Nhật.", feedback: "Excellent! 'Đóng cửa' = closed. 'Chủ Nhật' is the special word for Sunday — not a number." },
+      { en: "I have class on Wednesday and Thursday.", answer: "Tôi có lớp vào thứ Tư và thứ Năm.", feedback: "Great! 'Thứ Tư' = Wednesday (4th), 'thứ Năm' = Thursday (5th). The number system makes it logical!" },
+      { en: "What day is it today?", answer: "Hôm nay là thứ mấy?", feedback: "Well done! 'Thứ mấy' means 'which day of the week'. A very natural and common question." },
+      { en: "The weekend starts on Saturday.", answer: "Cuối tuần bắt đầu vào thứ Bảy.", feedback: "Great! 'Cuối tuần' = weekend. 'Bắt đầu' = starts/begins. 'Thứ Bảy' = Saturday." },
+    ],
+    Intermediate: [
+      { en: "We usually go out for dinner on Friday evenings.", answer: "Chúng tôi thường đi ăn tối vào tối thứ Sáu.", feedback: "Excellent! 'Thường' = usually. 'Tối thứ Sáu' = Friday evening. Doubling 'tối' (night/evening) for the time expression is very natural." },
+      { en: "The meeting was postponed to next Wednesday.", answer: "Cuộc họp đã bị dời sang thứ Tư tuần sau.", feedback: "Well done! 'Dời sang' = postponed to. 'Tuần sau' = next week. 'Bị' here marks an unplanned/unwanted event." },
+      { en: "I rest on weekdays and work on weekends.", answer: "Tôi nghỉ vào ngày trong tuần và làm việc vào cuối tuần.", feedback: "Great! 'Ngày trong tuần' = weekday (days within the week). Interesting flip from the norm — great practice sentence!" },
+    ],
+    Advanced: [
+      { en: "Throughout the working week, she manages to fit in an hour of exercise every single day.", answer: "Trong suốt tuần làm việc, cô ấy sắp xếp được một tiếng tập thể dục mỗi ngày.", feedback: "Outstanding! 'Trong suốt' = throughout. 'Sắp xếp được' = manages to arrange. 'Mỗi ngày' = every day. Very natural advanced phrasing." },
+    ]
+  },
+
+  "Months": {
+    Beginner: [
+      { en: "January is the first month.", answer: "Tháng Một là tháng đầu tiên.", feedback: "Great! Vietnamese months are numbered: Tháng Một (January) through Tháng Mười Hai (December). Very logical!" },
+      { en: "My birthday is in March.", answer: "Sinh nhật của tôi vào tháng Ba.", feedback: "Well done! 'Sinh nhật' = birthday. 'Tháng Ba' = March (3rd month). 'Vào' is used for months." },
+      { en: "It rains a lot in July.", answer: "Trời mưa nhiều vào tháng Bảy.", feedback: "Excellent! 'Trời mưa' = it rains (literally 'sky rains'). 'Nhiều' = a lot. Tháng Bảy = July." },
+      { en: "December is the last month of the year.", answer: "Tháng Mười Hai là tháng cuối năm.", feedback: "Perfect! 'Cuối năm' = end of the year. Notice 'Mười Hai' = twelve (10+2)." },
+      { en: "The holiday is in April.", answer: "Kỳ nghỉ vào tháng Tư.", feedback: "Great! 'Kỳ nghỉ' = holiday/vacation. 'Tháng Tư' = April (4th month)." },
+      { en: "What month is it now?", answer: "Bây giờ là tháng mấy?", feedback: "Well done! 'Tháng mấy' = which month. 'Bây giờ' = now. Very common question pattern." },
+    ],
+    Intermediate: [
+      { en: "The rainy season usually begins in May.", answer: "Mùa mưa thường bắt đầu vào tháng Năm.", feedback: "Excellent! 'Mùa mưa' = rainy season. 'Bắt đầu' = begins. Very useful seasonal vocabulary." },
+      { en: "We are getting married next June.", answer: "Chúng tôi sẽ kết hôn vào tháng Sáu năm sau.", feedback: "Great! 'Kết hôn' = get married. 'Năm sau' = next year. 'Sẽ' marks future tense." },
+      { en: "The Tet holiday falls in late January or early February.", answer: "Tết thường rơi vào cuối tháng Một hoặc đầu tháng Hai.", feedback: "Outstanding! 'Cuối' = late/end of. 'Đầu' = early/beginning of. 'Rơi vào' = falls on. Excellent cultural vocabulary!" },
+    ],
+    Advanced: [
+      { en: "From March through November, the central coast experiences unpredictable weather.", answer: "Từ tháng Ba đến tháng Mười Một, miền Trung có thời tiết khó đoán.", feedback: "Impressive! 'Từ...đến' = from...to. 'Miền Trung' = central region. 'Khó đoán' = unpredictable (hard to predict). Great advanced sentence!" },
+    ]
+  },
+
+  "Professions": {
+    Beginner: [
+      { en: "She is a doctor.", answer: "Cô ấy là bác sĩ.", feedback: "Great! 'Bác sĩ' = doctor. Note the pronoun: 'cô ấy' is used for an adult woman (she)." },
+      { en: "He is a teacher.", answer: "Anh ấy là giáo viên.", feedback: "Well done! 'Giáo viên' = teacher. 'Anh ấy' is used for a man around your age or older." },
+      { en: "I want to be a chef.", answer: "Tôi muốn làm đầu bếp.", feedback: "Perfect! 'Muốn' = want. 'Làm' = to be/work as. 'Đầu bếp' = chef/cook." },
+      { en: "My father is an engineer.", answer: "Bố tôi là kỹ sư.", feedback: "Excellent! 'Bố' = father (Northern dialect). 'Ba' is used in the South. 'Kỹ sư' = engineer." },
+      { en: "Are you a nurse?", answer: "Bạn có phải y tá không?", feedback: "Great! 'Có phải...không' is the standard yes/no question structure. 'Y tá' = nurse." },
+      { en: "He works as a driver.", answer: "Anh ấy làm tài xế.", feedback: "Well done! 'Tài xế' = driver. 'Làm' is used when specifying a profession someone does." },
+      { en: "My mother is a nurse.", answer: "Mẹ tôi là y tá.", feedback: "Great! 'Mẹ' = mother (Northern). 'Má' is used in the South. Simple and natural sentence." },
+    ],
+    Intermediate: [
+      { en: "She has been working as a lawyer for ten years.", answer: "Cô ấy đã làm luật sư được mười năm.", feedback: "Well done! The 'đã...được' structure expresses duration of a past/ongoing action. 'Luật sư' = lawyer." },
+      { en: "He is looking for a job as an accountant.", answer: "Anh ấy đang tìm việc làm kế toán.", feedback: "Great! 'Đang' marks ongoing action. 'Tìm việc' = looking for a job. 'Kế toán' = accountant." },
+      { en: "I switched careers from banking to teaching.", answer: "Tôi đã chuyển nghề từ ngân hàng sang dạy học.", feedback: "Impressive! 'Chuyển nghề' = switch careers. 'Từ...sang' = from...to. 'Dạy học' = teaching." },
+    ],
+    Advanced: [
+      { en: "She is pursuing a career in software engineering despite her background in finance.", answer: "Cô ấy đang theo đuổi sự nghiệp trong lĩnh vực kỹ thuật phần mềm mặc dù xuất phát từ lĩnh vực tài chính.", feedback: "Outstanding! 'Theo đuổi sự nghiệp' = pursuing a career. 'Mặc dù' = despite. 'Xuất phát từ' = coming from/background in. Very sophisticated!" },
+    ]
+  },
+
+  "Food and Drink": {
+    Beginner: [
+      { en: "I want a bowl of pho.", answer: "Tôi muốn một tô phở.", feedback: "Great! 'Tô' is the classifier for a large bowl. 'Phở' is Vietnam's most famous dish. Perfect beginner sentence!" },
+      { en: "This is delicious!", answer: "Cái này ngon quá!", feedback: "Excellent! 'Ngon' = delicious. 'Quá' intensifies the adjective (= so, very). Very natural exclamation." },
+      { en: "I would like some water, please.", answer: "Cho tôi một ly nước.", feedback: "Well done! 'Cho tôi' = please give me. 'Ly' = glass. 'Nước' = water. Essential restaurant phrase!" },
+      { en: "I don't eat pork.", answer: "Tôi không ăn thịt heo.", feedback: "Perfect! 'Thịt heo' = pork (Southern). 'Thịt lợn' is used in the North. Great dietary restriction phrase." },
+      { en: "The food here is very spicy.", answer: "Đồ ăn ở đây rất cay.", feedback: "Great! 'Đồ ăn' = food. 'Cay' = spicy. 'Rất' = very. Very useful when eating out!" },
+      { en: "Can I see the menu?", answer: "Cho tôi xem thực đơn.", feedback: "Well done! 'Xem' = to look at/see. 'Thực đơn' = menu. Simple and direct restaurant vocabulary." },
+      { en: "I'd like iced coffee with milk.", answer: "Cho tôi cà phê sữa đá.", feedback: "Excellent! 'Cà phê sữa đá' is iconic Vietnamese iced milk coffee. 'Đá' = ice. A must-know phrase!" },
+    ],
+    Intermediate: [
+      { en: "I am allergic to shellfish.", answer: "Tôi bị dị ứng với hải sản có vỏ.", feedback: "Great! 'Dị ứng' = allergy/allergic. 'Hải sản có vỏ' = shellfish (seafood with shell). Very important to know!" },
+      { en: "Could you make the dish less salty for me?", answer: "Bạn có thể làm món này ít mặn hơn cho tôi không?", feedback: "Well done! 'Ít hơn' = less. 'Mặn' = salty. 'Có thể...không' = polite request structure." },
+      { en: "We would like to order two banh mi and one bowl of bun bo Hue.", answer: "Chúng tôi muốn gọi hai bánh mì và một tô bún bò Huế.", feedback: "Excellent! 'Gọi' in restaurants means 'to order'. Great use of classifiers: 'cái' for bánh mì, 'tô' for soup bowls." },
+    ],
+    Advanced: [
+      { en: "Vietnamese cuisine varies significantly between the North, Central, and South regions.", answer: "Ẩm thực Việt Nam khác nhau đáng kể giữa ba miền Bắc, Trung và Nam.", feedback: "Outstanding! 'Ẩm thực' = cuisine. 'Khác nhau đáng kể' = varies significantly. 'Ba miền' = the three regions. Superb!" },
+    ]
+  },
+
+  "Shopping": {
+    Beginner: [
+      { en: "How much does this cost?", answer: "Cái này giá bao nhiêu?", feedback: "Essential phrase! 'Giá bao nhiêu' = how much (price). 'Cái này' = this (thing). You'll use this every day." },
+      { en: "That is too expensive.", answer: "Đắt quá.", feedback: "Great! 'Đắt' = expensive. 'Quá' = too much. Short and punchy — perfect for markets!" },
+      { en: "Can you lower the price?", answer: "Bạn có thể giảm giá không?", feedback: "Perfect for bargaining! 'Giảm giá' = lower the price / discount. Very useful at Vietnamese markets." },
+      { en: "I would like to buy this shirt.", answer: "Tôi muốn mua cái áo này.", feedback: "Well done! 'Mua' = buy. 'Áo' = shirt/top. 'Cái' is the classifier for clothing items." },
+      { en: "Do you have a bigger size?", answer: "Bạn có size lớn hơn không?", feedback: "Great! Interesting that 'size' is borrowed directly from English in Vietnamese shopping contexts. 'Lớn hơn' = bigger." },
+      { en: "I will take two of these.", answer: "Tôi lấy hai cái này.", feedback: "Natural! 'Lấy' in shopping context means 'to take/buy'. More colloquial than 'mua'." },
+      { en: "Where is the fitting room?", answer: "Phòng thử đồ ở đâu?", feedback: "Very useful! 'Phòng thử đồ' = fitting room (literally 'room try clothes'). 'Ở đâu' = where is." },
+    ],
+    Intermediate: [
+      { en: "Do you accept credit cards?", answer: "Bạn có chấp nhận thẻ tín dụng không?", feedback: "Excellent! 'Chấp nhận' = accept. 'Thẻ tín dụng' = credit card. Very practical for modern shopping." },
+      { en: "I would like to return this item, it's defective.", answer: "Tôi muốn trả lại món hàng này, nó bị lỗi.", feedback: "Well done! 'Trả lại' = return. 'Món hàng' = item. 'Bị lỗi' = is defective. Important consumer vocabulary." },
+      { en: "Could you wrap it as a gift?", answer: "Bạn có thể gói quà cho tôi không?", feedback: "Great! 'Gói quà' = wrap as a gift. Very practical phrase for gift shopping." },
+    ],
+    Advanced: [
+      { en: "I noticed the price tag says two hundred thousand but you charged me two hundred and fifty thousand.", answer: "Tôi thấy nhãn giá ghi hai trăm nghìn nhưng bạn tính tôi hai trăm năm mươi nghìn.", feedback: "Impressive! 'Nhãn giá' = price tag. 'Tính' = to charge (a price). 'Ghi' = written/says. Excellent consumer advocacy sentence!" },
+    ]
+  },
+
+  "Travel": {
+    Beginner: [
+      { en: "Where is the train station?", answer: "Nhà ga ở đâu?", feedback: "Great! 'Nhà ga' = train station. 'Ở đâu' = where is. Essential travel question." },
+      { en: "I need a taxi.", answer: "Tôi cần xe taxi.", feedback: "Simple and practical! 'Xe taxi' — 'xe' means vehicle, and 'taxi' is borrowed from English." },
+      { en: "How far is it to the airport?", answer: "Sân bay cách đây bao xa?", feedback: "Well done! 'Sân bay' = airport. 'Cách đây' = from here. 'Bao xa' = how far. Great travel phrase." },
+      { en: "I want to go to Hoan Kiem Lake.", answer: "Tôi muốn đến Hồ Hoàn Kiếm.", feedback: "Excellent! Hồ Hoàn Kiếm is one of Hanoi's most famous landmarks. 'Đến' = to go to / arrive at." },
+      { en: "One ticket to Da Nang, please.", answer: "Cho tôi một vé đi Đà Nẵng.", feedback: "Perfect! 'Vé đi' = ticket to (a destination). Da Nang is a beautiful central Vietnamese city." },
+      { en: "The hotel is next to the market.", answer: "Khách sạn ở cạnh chợ.", feedback: "Great! 'Khách sạn' = hotel. 'Ở cạnh' = next to / beside. Useful for giving directions." },
+    ],
+    Intermediate: [
+      { en: "How long does it take to get to Hoi An from Da Nang?", answer: "Đi từ Đà Nẵng đến Hội An mất bao lâu?", feedback: "Well done! 'Mất bao lâu' = takes how long. 'Từ...đến' = from...to. Very natural way to ask travel time." },
+      { en: "I would like to book a room for three nights.", answer: "Tôi muốn đặt phòng ba đêm.", feedback: "Excellent! 'Đặt phòng' = book a room. 'Đêm' = night. Very useful for accommodation." },
+      { en: "Could you recommend a good local restaurant nearby?", answer: "Bạn có thể giới thiệu cho tôi một nhà hàng địa phương gần đây không?", feedback: "Great! 'Giới thiệu' = recommend. 'Địa phương' = local. 'Gần đây' = nearby. Polished travel vocabulary." },
+    ],
+    Advanced: [
+      { en: "I prefer traveling off the beaten path rather than visiting typical tourist attractions.", answer: "Tôi thích đi những nơi ít người biết hơn là tham quan các điểm du lịch thông thường.", feedback: "Outstanding! 'Ít người biết' = few people know (off the beaten path). 'Điểm du lịch' = tourist attraction. 'Thông thường' = typical. Very sophisticated!" },
+    ]
+  },
+
+  "Family": {
+    Beginner: [
+      { en: "I have two sisters.", answer: "Tôi có hai chị em gái.", feedback: "Great! Vietnamese distinguishes older sister ('chị') from younger sister ('em gái'). 'Chị em gái' refers to sisters generally." },
+      { en: "My grandmother lives in Hanoi.", answer: "Bà của tôi sống ở Hà Nội.", feedback: "Well done! 'Bà' = grandmother (paternal or maternal). 'Sống ở' = lives in." },
+      { en: "He is my older brother.", answer: "Anh ấy là anh trai của tôi.", feedback: "Perfect! Vietnamese has different words for older brother ('anh trai') and younger brother ('em trai'). Very precise!" },
+      { en: "My family has four people.", answer: "Gia đình tôi có bốn người.", feedback: "Excellent! 'Gia đình' = family. 'Người' = people/persons. Common way to describe family size." },
+      { en: "My parents live in the countryside.", answer: "Bố mẹ tôi sống ở nông thôn.", feedback: "Great! 'Bố mẹ' = parents (father + mother, Northern dialect). 'Nông thôn' = countryside." },
+      { en: "Do you have any children?", answer: "Bạn có con không?", feedback: "Well done! 'Con' = child/children. 'Có...không' = the yes/no question structure. Very natural question." },
+    ],
+    Intermediate: [
+      { en: "My younger sister just got married last month.", answer: "Em gái tôi vừa mới kết hôn tháng trước.", feedback: "Well done! 'Vừa mới' = just recently. 'Kết hôn' = got married. 'Tháng trước' = last month." },
+      { en: "We are a close-knit family and spend a lot of time together.", answer: "Chúng tôi là một gia đình gắn kết và dành nhiều thời gian bên nhau.", feedback: "Excellent! 'Gắn kết' = close-knit/bonded. 'Dành thời gian' = spend time. 'Bên nhau' = together (beside each other)." },
+      { en: "My uncle on my mother's side works as a professor.", answer: "Cậu của tôi (em trai của mẹ) làm giáo sư.", feedback: "Great! Vietnamese family terms are very specific. 'Cậu' = mother's younger brother. 'Giáo sư' = professor. Impressive vocabulary!" },
+    ],
+    Advanced: [
+      { en: "In Vietnamese culture, it is common for multiple generations to live under one roof.", answer: "Trong văn hóa Việt Nam, nhiều thế hệ sống chung dưới một mái nhà là điều phổ biến.", feedback: "Outstanding! 'Thế hệ' = generation. 'Sống chung' = live together. 'Mái nhà' = roof/home. 'Phổ biến' = common. Beautiful cultural sentence!" },
+    ]
+  },
+
+  "Weather": {
+    Beginner: [
+      { en: "It is very hot today.", answer: "Hôm nay trời nóng quá.", feedback: "Great! 'Trời' = sky/weather. 'Nóng' = hot. 'Quá' = very/too. Classic Vietnamese weather sentence structure." },
+      { en: "Is it going to rain tomorrow?", answer: "Ngày mai trời có mưa không?", feedback: "Well done! 'Có...không' turns a statement into a yes/no question. 'Mưa' = rain." },
+      { en: "The weather is beautiful today.", answer: "Hôm nay thời tiết đẹp quá.", feedback: "Perfect! 'Thời tiết' = weather. 'Đẹp' = beautiful. A lovely phrase for a nice day!" },
+      { en: "It is very cold in Hanoi in winter.", answer: "Hà Nội rất lạnh vào mùa đông.", feedback: "Excellent! 'Lạnh' = cold. 'Mùa đông' = winter. Hanoi can indeed get quite cold!" },
+      { en: "Bring an umbrella — it might rain.", answer: "Mang theo ô đi — trời có thể mưa.", feedback: "Great! 'Ô' = umbrella. 'Có thể' = might/may. 'Mang theo' = bring along. Very practical!" },
+    ],
+    Intermediate: [
+      { en: "The typhoon season in Vietnam runs from October to December.", answer: "Mùa bão ở Việt Nam kéo dài từ tháng Mười đến tháng Mười Hai.", feedback: "Well done! 'Mùa bão' = typhoon season. 'Kéo dài' = runs/lasts. 'Từ...đến' = from...to." },
+      { en: "Although it was cloudy in the morning, it cleared up in the afternoon.", answer: "Mặc dù buổi sáng trời nhiều mây, nhưng buổi chiều thì trời quang.", feedback: "Excellent! 'Nhiều mây' = cloudy (many clouds). 'Trời quang' = clear sky. 'Mặc dù...nhưng' = although...but." },
+    ],
+    Advanced: [
+      { en: "Due to climate change, Vietnam is experiencing increasingly unpredictable monsoon patterns.", answer: "Do biến đổi khí hậu, Việt Nam đang trải qua những kiểu mưa gió mùa ngày càng khó đoán.", feedback: "Impressive! 'Biến đổi khí hậu' = climate change. 'Trải qua' = experiencing. 'Ngày càng' = increasingly. 'Mưa gió mùa' = monsoon. Expert level!" },
+    ]
+  },
+
+  "Directions": {
+    Beginner: [
+      { en: "Turn left at the intersection.", answer: "Rẽ trái ở ngã tư.", feedback: "Great! 'Rẽ trái' = turn left. 'Ngã tư' = intersection (four-way). Essential navigation vocabulary." },
+      { en: "Go straight for two kilometers.", answer: "Đi thẳng hai kilômét.", feedback: "Well done! 'Đi thẳng' = go straight. Very direct and clear direction." },
+      { en: "The bank is on the right side.", answer: "Ngân hàng ở bên phải.", feedback: "Perfect! 'Ngân hàng' = bank. 'Bên phải' = right side. 'Bên trái' would be left side." },
+      { en: "How do I get to the museum?", answer: "Làm sao để đến bảo tàng?", feedback: "Great! 'Làm sao để' = how do I / how to. 'Bảo tàng' = museum. Very natural way to ask for directions." },
+      { en: "It is near the post office.", answer: "Nó ở gần bưu điện.", feedback: "Well done! 'Gần' = near. 'Bưu điện' = post office. Useful landmark vocabulary." },
+    ],
+    Intermediate: [
+      { en: "Take the first right after the traffic light.", answer: "Rẽ phải đầu tiên sau đèn giao thông.", feedback: "Excellent! 'Đầu tiên' = first. 'Đèn giao thông' = traffic light. Very precise navigation instruction." },
+      { en: "You have passed it — you need to go back about fifty meters.", answer: "Bạn đã đi qua rồi — cần quay lại khoảng năm mươi mét.", feedback: "Well done! 'Đi qua rồi' = already passed it. 'Quay lại' = go back. 'Khoảng' = approximately. Very natural!" },
+    ],
+    Advanced: [
+      { en: "From the central market, head north along Le Loi Street until you reach the roundabout, then take the third exit.", answer: "Từ chợ trung tâm, đi về hướng bắc dọc theo đường Lê Lợi cho đến khi gặp vòng xuyến, rồi ra ở lối thoát thứ ba.", feedback: "Outstanding! 'Hướng bắc' = north direction. 'Dọc theo' = along. 'Vòng xuyến' = roundabout. 'Lối thoát' = exit. Expert navigation language!" },
+    ]
+  },
+
+  "Colors": {
+    Beginner: [
+      { en: "The sky is blue.", answer: "Bầu trời màu xanh.", feedback: "Great! 'Màu' = color. 'Xanh' in Vietnamese can mean both blue and green — context usually clarifies which!" },
+      { en: "I like the red dress.", answer: "Tôi thích cái váy màu đỏ.", feedback: "Well done! 'Váy' = dress. 'Đỏ' = red. 'Cái' is the classifier for clothing." },
+      { en: "The grass is green.", answer: "Cỏ màu xanh lá.", feedback: "Perfect! 'Xanh lá' = green (literally 'leaf blue/green'). 'Xanh da trời' or 'xanh lam' = blue. Important distinction!" },
+      { en: "She is wearing a yellow hat.", answer: "Cô ấy đang đội mũ màu vàng.", feedback: "Great! 'Đội' is specifically the verb for wearing hats. 'Vàng' = yellow. Notice the specific verb choice!" },
+      { en: "What is your favorite color?", answer: "Màu yêu thích của bạn là gì?", feedback: "Excellent! 'Yêu thích' = favorite (loved). 'Là gì' = is what. A great conversation starter." },
+      { en: "Black and white are not technically colors.", answer: "Đen và trắng về mặt kỹ thuật không phải là màu sắc.", feedback: "Well done! 'Đen' = black. 'Trắng' = white. 'Về mặt kỹ thuật' = technically. Great for more nuanced discussion." },
+    ],
+    Intermediate: [
+      { en: "The colors of the Vietnamese flag are red and yellow.", answer: "Màu cờ Việt Nam là đỏ và vàng.", feedback: "Excellent! Great cultural knowledge combined with color vocabulary. 'Cờ' = flag." },
+      { en: "I prefer darker shades of blue for formal occasions.", answer: "Tôi thích những sắc xanh đậm hơn cho các dịp trang trọng.", feedback: "Well done! 'Sắc' = shade/hue. 'Đậm' = dark/deep. 'Dịp trang trọng' = formal occasions. Sophisticated vocabulary!" },
+    ],
+    Advanced: [
+      { en: "The vibrant colors of Hoi An lanterns at night create an enchanting atmosphere.", answer: "Màu sắc rực rỡ của đèn lồng Hội An vào ban đêm tạo nên một bầu không khí huyền ảo.", feedback: "Breathtaking sentence! 'Rực rỡ' = vibrant/brilliant. 'Đèn lồng' = lanterns. 'Huyền ảo' = enchanting/magical. 'Bầu không khí' = atmosphere. Expert level!" },
+    ]
+  },
+
+  "Time": {
+    Beginner: [
+      { en: "What time is it?", answer: "Bây giờ là mấy giờ?", feedback: "Essential phrase! 'Mấy giờ' = what time / what hour. 'Bây giờ' = now. You'll use this constantly." },
+      { en: "It is three o'clock.", answer: "Bây giờ là ba giờ.", feedback: "Well done! Time in Vietnamese: number + 'giờ'. Simple and logical. 'Ba giờ' = 3 o'clock." },
+      { en: "I wake up at six thirty.", answer: "Tôi thức dậy lúc sáu giờ rưỡi.", feedback: "Great! 'Rưỡi' = half (30 minutes). 'Thức dậy' = wake up. 'Lúc' is used before specific times." },
+      { en: "The meeting is at two in the afternoon.", answer: "Cuộc họp lúc hai giờ chiều.", feedback: "Perfect! 'Chiều' = afternoon/evening. 'Sáng' = morning. Vietnamese specifies time of day instead of AM/PM." },
+      { en: "I will be there in ten minutes.", answer: "Tôi sẽ đến đó trong mười phút.", feedback: "Well done! 'Phút' = minute. 'Trong' = within/in. 'Đến đó' = get there. Very practical phrase." },
+    ],
+    Intermediate: [
+      { en: "The store opens at nine and closes at nine in the evening.", answer: "Cửa hàng mở cửa lúc chín giờ sáng và đóng cửa lúc chín giờ tối.", feedback: "Excellent! 'Mở cửa' = opens. 'Đóng cửa' = closes. 'Tối' = evening/night. Note how 'sáng' and 'tối' distinguish AM from PM." },
+      { en: "I have been waiting for over an hour.", answer: "Tôi đã đợi hơn một tiếng rồi.", feedback: "Well done! 'Đợi' = waiting. 'Hơn' = over/more than. 'Tiếng' = hour (colloquial). 'Rồi' emphasizes the completed duration." },
+    ],
+    Advanced: [
+      { en: "By the time you arrive, I will have already finished preparing the meal.", answer: "Khi bạn đến, tôi đã chuẩn bị xong bữa ăn rồi.", feedback: "Outstanding! 'Khi' = by the time/when. 'Chuẩn bị xong' = finished preparing. 'Rồi' = already. Excellent use of temporal sequence!" },
+    ]
+  },
+
+  "Greetings": {
+    Beginner: [
+      { en: "Hello, how are you?", answer: "Xin chào, bạn có khỏe không?", feedback: "Great! 'Xin chào' = hello (formal). 'Có khỏe không' = are you well/healthy. Very standard greeting." },
+      { en: "Good morning!", answer: "Chào buổi sáng!", feedback: "Well done! You can also say 'Buổi sáng tốt lành'. 'Chào buổi sáng' is the most natural translation." },
+      { en: "Goodbye, see you later.", answer: "Tạm biệt, hẹn gặp lại.", feedback: "Perfect! 'Tạm biệt' = goodbye. 'Hẹn gặp lại' = see you again (literally 'appointment to meet again')." },
+      { en: "I am fine, thank you.", answer: "Tôi khỏe, cảm ơn bạn.", feedback: "Excellent! 'Khỏe' = healthy/well. 'Cảm ơn' = thank you. Simple and polite response." },
+      { en: "Good night!", answer: "Chúc ngủ ngon!", feedback: "Great! 'Chúc' = wish. 'Ngủ ngon' = sleep well/good sleep. Literally 'I wish you good sleep!' Lovely phrase." },
+      { en: "Thank you very much.", answer: "Cảm ơn bạn rất nhiều.", feedback: "Well done! 'Rất nhiều' = very much. 'Cảm ơn' alone is also perfectly natural and common." },
+      { en: "You are welcome.", answer: "Không có gì.", feedback: "Perfect! 'Không có gì' literally means 'it is nothing'. This is the most common way to say 'you're welcome' in Vietnamese." },
+    ],
+    Intermediate: [
+      { en: "It has been so long — how have you been?", answer: "Lâu quá không gặp — bạn dạo này thế nào?", feedback: "Excellent! 'Lâu quá' = it's been so long. 'Dạo này thế nào' = how have you been lately. Very warm and natural greeting." },
+      { en: "Please give my regards to your family.", answer: "Xin gửi lời thăm hỏi đến gia đình bạn.", feedback: "Well done! 'Gửi lời thăm hỏi' = give regards/send greetings. 'Đến' = to. Very warm and polite expression." },
+    ],
+    Advanced: [
+      { en: "It is such a coincidence running into you here — what brings you to this part of town?", answer: "Thật tình cờ khi gặp bạn ở đây — có chuyện gì mà bạn đến khu này vậy?", feedback: "Impressive! 'Tình cờ' = coincidence. 'Có chuyện gì mà' = what brings you to (literally 'what matter that'). 'Khu' = area/neighborhood. Very natural conversation." },
+    ]
+  },
+
+  "At the Doctor": {
+    Beginner: [
+      { en: "I have a headache.", answer: "Tôi bị đau đầu.", feedback: "Essential phrase! 'Bị' is used for undesirable conditions/illnesses. 'Đau đầu' = headache (painful head)." },
+      { en: "I have a fever.", answer: "Tôi bị sốt.", feedback: "Important! 'Sốt' = fever. 'Bị sốt' = have a fever. 'Bị' marks that this is something happening to you." },
+      { en: "Where does it hurt?", answer: "Bạn đau ở đâu?", feedback: "Great medical question! 'Đau' = hurt/painful. 'Ở đâu' = where. Very direct and clear." },
+      { en: "I need to see a doctor.", answer: "Tôi cần gặp bác sĩ.", feedback: "Critical phrase! 'Gặp' = to meet/see. 'Bác sĩ' = doctor. Simple and direct." },
+      { en: "I have been sick for three days.", answer: "Tôi đã bị bệnh ba ngày rồi.", feedback: "Well done! 'Bệnh' = sick/ill. 'Rồi' emphasizes the duration that has passed. Important for describing symptoms." },
+      { en: "I am allergic to penicillin.", answer: "Tôi bị dị ứng với penicillin.", feedback: "Vital phrase! 'Dị ứng với' = allergic to. Knowing this phrase could be very important in a medical emergency." },
+    ],
+    Intermediate: [
+      { en: "I have had a sore throat and runny nose since yesterday.", answer: "Tôi bị đau họng và sổ mũi từ hôm qua.", feedback: "Well done! 'Đau họng' = sore throat. 'Sổ mũi' = runny nose. 'Từ hôm qua' = since yesterday. Excellent symptom description." },
+      { en: "Do I need to take this medicine with food?", answer: "Tôi có cần uống thuốc này cùng với thức ăn không?", feedback: "Excellent! 'Uống thuốc' = take medicine (literally 'drink medicine'). 'Cùng với' = along with. Very practical medical vocabulary." },
+      { en: "How many times a day should I take this?", answer: "Tôi nên uống cái này mấy lần một ngày?", feedback: "Great! 'Mấy lần' = how many times. 'Một ngày' = per day. Essential for understanding prescription instructions." },
+    ],
+    Advanced: [
+      { en: "I have a history of high blood pressure and would like to know if this medication is safe for me.", answer: "Tôi có tiền sử cao huyết áp và muốn biết liệu thuốc này có an toàn cho tôi không.", feedback: "Outstanding! 'Tiền sử' = history (medical). 'Cao huyết áp' = high blood pressure. 'Liệu...không' = whether or not. Very sophisticated medical communication." },
+    ]
+  }
+};
+
+// Language name map
+const LANG_NAMES = {
+  en:'English', fr:'French', es:'Spanish', de:'German',
+  pt:'Portuguese', zh:'Mandarin Chinese', ja:'Japanese',
+  vi:'Vietnamese', ko:'Korean', it:'Italian'
+};
+
+// TTS language codes
+const LANG_TTS = {
+  en:'en-US', fr:'fr-FR', es:'es-ES', de:'de-DE',
+  pt:'pt-BR', zh:'zh-CN', ja:'ja-JP', vi:'vi-VN',
+  ko:'ko-KR', it:'it-IT'
+};
+
+// Speech recognition codes
+const LANG_SR = {
+  en:'en-US', fr:'fr-FR', es:'es-ES', de:'de-DE',
+  pt:'pt-BR', zh:'zh-TW', ja:'ja-JP', vi:'vi-VN',
+  ko:'ko-KR', it:'it-IT'
+};
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let selectedLevel = 'Beginner';
+let sessionQueue = [];
+let currentIndex = 0;
+let currentItem = null;
+let userTranscript = '';
+let recognition = null;
+let isRecording = false;
+let sessionTotal = 8;
+
+// ── PILLS ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    selectedLevel = p.dataset.level;
+  });
+});
+
+// ── TTS ──────────────────────────────────────────────────────────────────────
+function ensureVoices(cb) {
+  if (!window.speechSynthesis) { cb([]); return; }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) { cb(voices); return; }
+  window.speechSynthesis.onvoiceschanged = () => cb(window.speechSynthesis.getVoices());
+}
+
+function getBestVoice(voices, langCode) {
+  const ttsCode = LANG_TTS[langCode] || 'en-US';
+  const base = ttsCode.split('-')[0];
+  const female = voices.filter(v => v.lang.startsWith(base) && /female|natural|enhanced|premium|zira|samantha|moira|fiona|karen/i.test(v.name));
+  if (female.length) return female[0];
+  return voices.find(v => v.lang === ttsCode)
+      || voices.find(v => v.lang.startsWith(base))
+      || null;
+}
+
+function speak(text, langCode, onEnd) {
+  if (!window.speechSynthesis || !text) { if (onEnd) onEnd(); return; }
+  window.speechSynthesis.cancel();
+  ensureVoices(voices => {
+    const utter = new SpeechSynthesisUtterance(text);
+    const voice = getBestVoice(voices, langCode);
+    if (voice) utter.voice = voice;
+    utter.lang = LANG_TTS[langCode] || 'en-US';
+    utter.rate = langCode === 'vi' ? 0.78 : 0.88;
+    utter.pitch = 1.05;
+    utter.volume = 1.0;
+    if (onEnd) utter.onend = onEnd;
+    setTimeout(() => window.speechSynthesis.speak(utter), 80);
+  });
+}
+
+// ── BUILD SESSION QUEUE ──────────────────────────────────────────────────────
+function buildQueue(scenario, level) {
+  const pool = (SENTENCE_BANK[scenario] || {})[level] || [];
+  // Shuffle and take up to sessionTotal
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(sessionTotal, shuffled.length));
+}
+
+// ── GET TRANSLATED ANSWER ─────────────────────────────────────────────────────
+// If practice language is Vietnamese, we have the answer in the bank.
+// For other languages, we show the English sentence as the "correct answer"
+// with a note that the bank is Vietnamese-focused.
+function getAnswer(item, practLang) {
+  if (practLang === 'vi') {
+    return { answer: item.answer, feedback: item.feedback };
+  }
+  // For non-Vietnamese languages, provide the English answer as reference
+  // and generic feedback (no API = no translation, so we inform the user)
+  return {
+    answer: item.answer, // still Vietnamese for reference
+    feedback: "Note: This app's pre-built translations are Vietnamese. For other language pairs, consider using the app as a vocabulary prompt and checking your answer with a reference. Keep practicing!"
+  };
+}
+
+// ── START ────────────────────────────────────────────────────────────────────
+function startPractice() {
+  const scenario = document.getElementById('scenario').value;
+  const practLang = document.getElementById('practice-lang').value;
+
+  sessionQueue = buildQueue(scenario, selectedLevel);
+  if (sessionQueue.length === 0) {
+    alert('No sentences available for this combination yet. Try a different scenario or level.');
+    return;
+  }
+  sessionTotal = sessionQueue.length;
+  currentIndex = 0;
+
+  document.getElementById('settings-card').style.display = 'none';
+  document.getElementById('practice-section').style.display = 'flex';
+  document.getElementById('practice-lang-label').textContent = LANG_NAMES[practLang] || practLang;
+  document.getElementById('fallback-lang-label').textContent = LANG_NAMES[practLang] || practLang;
+  document.getElementById('complete-lang').textContent = LANG_NAMES[practLang] || practLang;
+  document.getElementById('scenario-badge').textContent = scenario;
+
+  showSentence();
+}
+
+// ── SHOW SENTENCE ─────────────────────────────────────────────────────────────
+function showSentence() {
+  if (currentIndex >= sessionQueue.length) {
+    showComplete();
+    return;
+  }
+
+  currentItem = sessionQueue[currentIndex];
+  userTranscript = '';
+  isRecording = false;
+
+  // Reset UI
+  document.getElementById('result-card').classList.remove('visible');
+  document.getElementById('action-buttons').style.display = 'none';
+  document.getElementById('btn-submit').classList.remove('visible');
+  document.getElementById('transcript-box').textContent = 'Your speech will appear here…';
+  document.getElementById('transcript-box').style.display = 'block';
+  document.getElementById('recording-status').textContent = '';
+  document.getElementById('mic-btn').classList.remove('recording');
+  document.getElementById('mic-btn').disabled = false;
+  document.getElementById('mic-hint').textContent = 'Tap the mic and speak';
+  document.getElementById('warn-banner').classList.remove('visible');
+  document.getElementById('fallback-input').value = '';
+  document.getElementById('fallback-area').classList.add('visible');
+  document.getElementById('or-divider').style.display = 'block';
+  document.getElementById('complete-card').classList.remove('visible');
+  document.getElementById('sentence-card').style.display = 'block';
+  document.getElementById('mic-area').style.display = 'flex';
+
+  document.getElementById('sentence-display').textContent = currentItem.en;
+  updateProgress();
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+function updateProgress() {
+  const pct = (currentIndex / sessionTotal) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-count').textContent = (currentIndex + 1) + ' / ' + sessionTotal;
+}
+
+// ── SPEECH RECOGNITION ───────────────────────────────────────────────────────
+function buildRecognition(langCode) {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) return null;
+  try {
+    const rec = new SpeechRec();
+    rec.lang = LANG_SR[langCode] || 'vi-VN';
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+
+    rec.onresult = (e) => {
+      let interim = '', final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t; else interim += t;
+      }
+      document.getElementById('transcript-box').textContent = final || interim || 'Listening…';
+      if (final) userTranscript = final.trim();
+    };
+
+    rec.onend = () => {
+      isRecording = false;
+      document.getElementById('mic-btn').classList.remove('recording');
+      document.getElementById('recording-status').textContent = '';
+      document.getElementById('mic-hint').textContent = userTranscript ? 'Tap to try again' : 'No speech — tap to retry';
+      if (userTranscript) document.getElementById('btn-submit').classList.add('visible');
+    };
+
+    rec.onerror = (e) => {
+      isRecording = false;
+      document.getElementById('mic-btn').classList.remove('recording');
+      document.getElementById('recording-status').textContent = '';
+      const msgs = { 'no-speech':'No speech detected — try again', 'not-allowed':'Mic access denied — check browser settings', 'network':'Network error' };
+      document.getElementById('transcript-box').textContent = msgs[e.error] || 'Error: ' + e.error;
+      document.getElementById('mic-hint').textContent = 'Tap to try again';
+    };
+
+    return rec;
+  } catch(err) {
+    console.warn('SpeechRecognition build failed:', err);
+    return null;
+  }
+}
+
+function toggleRecording() {
+  if (isRecording) { recognition && recognition.stop(); return; }
+
+  userTranscript = '';
+  document.getElementById('transcript-box').textContent = 'Listening…';
+  document.getElementById('btn-submit').classList.remove('visible');
+
+  const practLang = document.getElementById('practice-lang').value;
+  recognition = buildRecognition(practLang);
+
+  if (!recognition) { showMicFallback(); return; }
+
+  try {
+    recognition.start();
+    isRecording = true;
+    document.getElementById('mic-btn').classList.add('recording');
+    document.getElementById('recording-status').textContent = '● Recording…';
+    document.getElementById('mic-hint').textContent = 'Tap to stop';
+  } catch(err) {
+    console.warn('recognition.start() failed:', err);
+    isRecording = false;
+    showMicFallback();
+  }
+}
+
+function showMicFallback() {
+  document.getElementById('warn-banner').classList.add('visible');
+  document.getElementById('mic-btn').disabled = true;
+  document.getElementById('mic-hint').textContent = 'Voice not available';
+}
+
+function submitFallback() {
+  const val = document.getElementById('fallback-input').value.trim();
+  if (!val) return;
+  userTranscript = val;
+  document.getElementById('transcript-box').textContent = val;
+  showResult();
+}
+
+// ── COMPARE USER ANSWER TO CORRECT ───────────────────────────────────────────
+function normalise(str) {
+  return str.toLowerCase()
+    .replace(/[.,!?;:""']/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenSimilarity(a, b) {
+  const ta = new Set(normalise(a).split(' '));
+  const tb = new Set(normalise(b).split(' '));
+  let matches = 0;
+  ta.forEach(w => { if (tb.has(w)) matches++; });
+  return matches / Math.max(ta.size, tb.size);
+}
+
+function buildPersonalisedFeedback(userAnswer, correctAnswer, baseFeedback) {
+  if (!userAnswer || userAnswer.trim() === '') {
+    return "You didn't submit an answer this time. Here's the correct sentence for you to study. " + baseFeedback;
+  }
+
+  const sim = tokenSimilarity(userAnswer, correctAnswer);
+  const normUser = normalise(userAnswer);
+  const normCorrect = normalise(correctAnswer);
+
+  // Work out which words matched and which didn't
+  const userWords = normUser.split(' ');
+  const correctWords = normCorrect.split(' ');
+  const correctSet = new Set(correctWords);
+  const userSet = new Set(userWords);
+
+  const matched = userWords.filter(w => correctSet.has(w));
+  const missing = correctWords.filter(w => !userSet.has(w));
+  const extra = userWords.filter(w => !correctSet.has(w));
+
+  let verdict = '';
+  let details = '';
+
+  if (sim >= 0.92) {
+    verdict = "Excellent — your answer is correct! Great pronunciation and word choice.";
+  } else if (sim >= 0.70) {
+    verdict = "Good effort! Your answer was mostly right with a few things to fine-tune.";
+  } else if (sim >= 0.45) {
+    verdict = "A reasonable attempt — you got some key words but there are several things to work on.";
+  } else {
+    verdict = "This one was tricky. Keep practicing — here's a breakdown to help you.";
+  }
+
+  if (matched.length > 0 && sim < 0.92) {
+    details += " You correctly used: " + matched.slice(0, 5).join(', ') + ".";
+  }
+  if (missing.length > 0 && sim < 0.92) {
+    details += " Words or phrases you missed: " + missing.slice(0, 5).join(', ') + ".";
+  }
+  if (extra.length > 0 && extra.length <= 4 && sim < 0.92) {
+    details += " Words in your answer that weren't needed: " + extra.slice(0, 3).join(', ') + ".";
+  }
+
+  return verdict + details + " " + baseFeedback;
+}
+
+// ── PARSE FEEDBACK INTO SEGMENTS (native + practice language phrases) ─────────
+// Detects quoted Vietnamese/practice-language words like 'Tôi' or "xin chào"
+// and splits the feedback into alternating [text, lang] segments.
+function parseFeedbackSegments(feedbackText, myLang, practLang) {
+  // Match single-quoted phrases e.g. 'Tôi đến từ Mỹ' or 'bác sĩ'
+  // and text between them
+  const segments = [];
+  const regex = /'([^']+)'/g;
+  let lastIndex = 0;
+  let match;
+  while ((match = regex.exec(feedbackText)) !== null) {
+    // Text before the quote — read in native language
+    if (match.index > lastIndex) {
+      const pre = feedbackText.slice(lastIndex, match.index);
+      if (pre.trim()) segments.push({ text: pre, lang: myLang });
+    }
+    // The quoted phrase — read in practice language
+    segments.push({ text: match[1], lang: practLang });
+    lastIndex = regex.lastIndex;
+  }
+  // Remaining text after last quote
+  if (lastIndex < feedbackText.length) {
+    const post = feedbackText.slice(lastIndex);
+    if (post.trim()) segments.push({ text: post, lang: myLang });
+  }
+  // Fallback: no quotes found — just read everything in native language
+  if (segments.length === 0) {
+    segments.push({ text: feedbackText, lang: myLang });
+  }
+  return segments;
+}
+
+// Speak an array of {text, lang} segments sequentially
+function speakSegments(segments, index) {
+  if (index >= segments.length) return;
+  const seg = segments[index];
+  speak(seg.text, seg.lang, () => {
+    setTimeout(() => speakSegments(segments, index + 1), 200);
+  });
+}
+
+// ── SHOW RESULT ───────────────────────────────────────────────────────────────
+function showResult() {
+  const typed = document.getElementById('fallback-input').value.trim();
+  if (!userTranscript && !typed) return;
+  if (!userTranscript && typed) userTranscript = typed;
+
+  const practLang = document.getElementById('practice-lang').value;
+  const myLang = document.getElementById('my-lang').value;
+  const { answer, feedback: baseFeedback } = getAnswer(currentItem, practLang);
+
+  const fullFeedback = buildPersonalisedFeedback(userTranscript, answer, baseFeedback);
+
+  document.getElementById('btn-submit').classList.remove('visible');
+  document.getElementById('fallback-area').classList.remove('visible');
+  document.getElementById('or-divider').style.display = 'none';
+
+  document.getElementById('correct-answer-text').textContent = answer;
+  document.getElementById('feedback-text').textContent = fullFeedback;
+  document.getElementById('result-card').classList.add('visible');
+  document.getElementById('action-buttons').style.display = 'grid';
+
+  // 1. Speak correct answer in practice language
+  // 2. Pause, then read feedback with practice-language phrases spoken in practice language
+  speak(answer, practLang, () => {
+    setTimeout(() => {
+      const segments = parseFeedbackSegments(fullFeedback, myLang, practLang);
+      speakSegments(segments, 0);
+    }, 1000);
+  });
+}
+
+function speakText(which) {
+  const practLang = document.getElementById('practice-lang').value;
+  const myLang = document.getElementById('my-lang').value;
+  if (which === 'correct') {
+    speak(document.getElementById('correct-answer-text').textContent, practLang);
+  } else {
+    const feedbackText = document.getElementById('feedback-text').textContent;
+    const segments = parseFeedbackSegments(feedbackText, myLang, practLang);
+    speakSegments(segments, 0);
+  }
+}
+
+// ── SYNC LANGUAGE SELECTORS ───────────────────────────────────────────────────
+function syncLangSelects(changed) {
+  // Keep labels in sync — nothing else needed since both selects are always visible
+  const practLang = document.getElementById('practice-lang').value;
+  const plLabel = document.getElementById('practice-lang-label');
+  const flLabel = document.getElementById('fallback-lang-label');
+  const clLabel = document.getElementById('complete-lang');
+  if (plLabel) plLabel.textContent = LANG_NAMES[practLang] || practLang;
+  if (flLabel) flLabel.textContent = LANG_NAMES[practLang] || practLang;
+  if (clLabel) clLabel.textContent = LANG_NAMES[practLang] || practLang;
+}
+
+// ── REPEAT / NEXT ─────────────────────────────────────────────────────────────
+function repeatSentence() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  document.getElementById('result-card').classList.remove('visible');
+  document.getElementById('action-buttons').style.display = 'none';
+  document.getElementById('btn-submit').classList.remove('visible');
+  document.getElementById('transcript-box').textContent = 'Your speech will appear here…';
+  document.getElementById('transcript-box').style.display = 'block';
+  document.getElementById('mic-hint').textContent = 'Tap the mic and speak';
+  document.getElementById('mic-btn').disabled = false;
+  document.getElementById('warn-banner').classList.remove('visible');
+  document.getElementById('fallback-input').value = '';
+  document.getElementById('fallback-area').classList.add('visible');
+  document.getElementById('or-divider').style.display = 'block';
+  userTranscript = '';
+  isRecording = false;
+}
+
+function nextSentence() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  currentIndex++;
+  showSentence();
+}
+
+// ── COMPLETE ──────────────────────────────────────────────────────────────────
+function showComplete() {
+  document.getElementById('sentence-card').style.display = 'none';
+  document.getElementById('mic-area').style.display = 'none';
+  document.getElementById('transcript-box').style.display = 'none';
+  document.getElementById('or-divider').style.display = 'none';
+  document.getElementById('fallback-area').classList.remove('visible');
+  document.getElementById('result-card').classList.remove('visible');
+  document.getElementById('action-buttons').style.display = 'none';
+  document.getElementById('btn-submit').classList.remove('visible');
+  document.getElementById('complete-card').classList.add('visible');
+  const pct = 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-count').textContent = sessionTotal + ' / ' + sessionTotal;
+}
+
+function restartPractice() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  document.getElementById('practice-section').style.display = 'none';
+  document.getElementById('settings-card').style.display = 'flex';
+  document.getElementById('complete-card').classList.remove('visible');
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('progress-count').textContent = '0 / 8';
+}
+</script>
+</body>
+</html>
